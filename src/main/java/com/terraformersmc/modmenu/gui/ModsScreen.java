@@ -390,7 +390,28 @@ public class ModsScreen extends Screen {
 
 	@Override
 	public void renderBackground(MatrixStack matrices) {
-		ModsScreen.overlayBackground(0, 0, this.width, this.height, 64, 64, 64, 255, 255);
+		if (this.client.world != null) {
+			this.fillGradient(matrices, 0, 0, this.width, this.height, 
+				0xC0101010, 0xD0101010);
+			
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.25F);
+			RenderSystem.enableBlend();
+			RenderSystem.defaultBlendFunc();
+			
+			for (int i = 0; i < 2; i++) {
+				RenderSystem.setShaderTexture(0, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+				for (int x = -2 + i; x <= this.width / 32 + 2; x++) {
+					for (int y = -2 + i; y <= this.height / 32 + 2; y++) {
+						DrawableHelper.drawTexture(matrices, x * 32, y * 32, 0, 0, 32, 32, 32, 32);
+					}
+				}
+			}
+			
+			RenderSystem.disableBlend();
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		} else {
+			super.renderBackground(matrices);
+		}
 	}
 
 	static void overlayBackground(int x1, int y1, int x2, int y2, int red, int green, int blue, int startAlpha, int endAlpha) {

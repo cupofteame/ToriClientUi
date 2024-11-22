@@ -1,12 +1,18 @@
 package com.terraformersmc.modmenu.event;
 
+import java.util.List;
+
+import org.lwjgl.glfw.GLFW;
+
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import com.terraformersmc.modmenu.config.ModMenuConfig;
 import com.terraformersmc.modmenu.gui.ModsScreen;
+import com.terraformersmc.modmenu.gui.OverlayMenuScreen;
 import com.terraformersmc.modmenu.gui.widget.ModMenuButtonWidget;
 import com.terraformersmc.modmenu.gui.widget.UpdateCheckerTexturedButtonWidget;
 import com.terraformersmc.modmenu.util.ModrinthUtil;
+
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -24,8 +30,6 @@ import net.minecraft.text.TextContent;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Identifier;
 
-import java.util.List;
-
 public class ModMenuEventHandler {
 	public static final Identifier FABRIC_ICON_BUTTON_LOCATION = new Identifier(ModMenu.MOD_ID, "textures/gui/mods_button.png");
 	private static KeyBinding MENU_KEY_BIND;
@@ -34,7 +38,7 @@ public class ModMenuEventHandler {
 		MENU_KEY_BIND = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.modmenu.open_menu",
 				InputUtil.Type.KEYSYM,
-				InputUtil.UNKNOWN_KEY.getCode(),
+				GLFW.GLFW_KEY_RIGHT_SHIFT,
 				"key.categories.misc"
 		));
 		ClientTickEvents.END_CLIENT_TICK.register(ModMenuEventHandler::onClientEndTick);
@@ -96,7 +100,9 @@ public class ModMenuEventHandler {
 
 	private static void onClientEndTick(MinecraftClient client) {
 		while (MENU_KEY_BIND.wasPressed()) {
-			client.setScreen(new ModsScreen(client.currentScreen));
+			if (client.currentScreen == null || !(client.currentScreen instanceof OverlayMenuScreen)) {
+				client.setScreen(new OverlayMenuScreen());
+			}
 		}
 	}
 
